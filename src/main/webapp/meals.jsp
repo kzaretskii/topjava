@@ -34,15 +34,7 @@
         <th>Calories</th>
     </tr>
     <c:forEach items="${requestScope.ListMealTo}" var="mealTo">
-        <c:choose>
-            <c:when test="${mealTo.excess}">
-                <c:set var="textStyle" value="redText"/>
-            </c:when>
-            <c:otherwise>
-                <c:set var="textStyle" value="greenText"/>
-            </c:otherwise>
-        </c:choose>
-        <tr class="${textStyle}">
+        <tr class="${mealTo.excess ? "redText" : "greenText"}">
             <javatime:parseLocalDate value="${mealTo.date}" pattern="yyyy-MM-dd" var="parsedDate"/>
             <javatime:parseLocalTime value="${mealTo.time}" pattern="HH:mm" var="parsedTime"/>
             <td><c:out value="${parsedDate} ${parsedTime}"/></td>

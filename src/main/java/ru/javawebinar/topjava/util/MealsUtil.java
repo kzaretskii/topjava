@@ -1,5 +1,7 @@
 package ru.javawebinar.topjava.util;
 
+import ru.javawebinar.topjava.dao.MealDao;
+import ru.javawebinar.topjava.dao.MealDaoMemory;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
 
@@ -7,34 +9,31 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class MealsUtil {
-    public static void main(String[] args) {
-        List<Meal> meals = getFixMeals();
+    public static List<Meal> mealsList = Arrays.asList(
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500, 1),
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000, 2),
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500, 3),
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100, 4),
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000, 5),
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500, 6),
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410, 7)
+    );
+    public static final int caloriesPerDay = 2000;
+    private static final MealDao mealDao = new MealDaoMemory();
 
-        List<MealTo> mealsTo = filteredByStreams(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
+    public static void main(String[] args) {
+        List<MealTo> mealsTo = filteredByStreams(mealsList, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
         mealsTo.forEach(System.out::println);
     }
 
-    public static List<Meal> getFixMeals(){
-        return Arrays.asList(
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
-        );
-    }
-
-    public static List<MealTo> mealsToMealsTo(List<Meal> meals){
-        return filteredByStreams(meals, LocalTime.MIN, LocalTime.MAX, 2000);
+    public static List<MealTo> mealsToMealsTo(List<Meal> meals, int caloriesPerDay) {
+        return filteredByStreams(meals, LocalTime.MIN, LocalTime.MAX, caloriesPerDay);
     }
 
     public static List<MealTo> filteredByStreams(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
@@ -51,6 +50,21 @@ public class MealsUtil {
     }
 
     private static MealTo createTo(Meal meal, boolean excess) {
-        return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
+        return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), meal.getId(), excess);
+    }
+
+    public static void createUpdateMeal(LocalDateTime dateTime, String description, int calories, int id) {
+        if (id == 0)
+            mealDao.add(dateTime, description, calories);
+        else
+            mealDao.updateMeal(dateTime, description, calories, id);
+    }
+
+    public static MealTo getMealToByIdWithoutExcess(int id){
+        return createTo(mealDao.getById(id), false);
+    }
+
+    public static List<MealTo> getAll(){
+        return mealsToMealsTo(mealDao.getAll(), caloriesPerDay);
     }
 }

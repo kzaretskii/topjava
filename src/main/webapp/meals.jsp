@@ -30,8 +30,6 @@
     <h3><a href="index.html">Home</a></h3>
     <hr/>
     <h2>Meals</h2>
-    <a href="meals?action=create">Add Meal</a>
-    <br><br>
     <form method="post" action="meals">
         <div class="row">
             <label>От даты (включая):<input class="block" type="date" name="dateFrom" value="${dateFrom}"/></label>
@@ -48,7 +46,7 @@
         <br>
         <button type="submit" name="filter">Отфильтровать</button>
     </form>
-    <br><br>
+    <a href="meals?action=create">Add Meal</a>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>
         <tr>

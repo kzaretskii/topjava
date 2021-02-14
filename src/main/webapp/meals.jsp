@@ -14,6 +14,15 @@
         .excess {
             color: red;
         }
+
+        .row {
+            display: inline-block;
+        }
+
+        .block {
+            display: block;
+            width: 150px;
+        }
     </style>
 </head>
 <body>
@@ -22,6 +31,23 @@
     <hr/>
     <h2>Meals</h2>
     <a href="meals?action=create">Add Meal</a>
+    <br><br>
+    <form method="post" action="meals">
+        <div class="row">
+            <label>От даты (включая):<input class="block" type="date" name="dateFrom" value="${dateFrom}"/></label>
+        </div>
+        <div class="row">
+            <label>До даты (включая):<input class="block" type="date" name="dateTo" value="${dateTo}"/></label>
+        </div>
+        <div class="row">
+            <label>От времени (включая):<input class="block" type="time" name="timeFrom" value="${timeFrom}"/></label>
+        </div>
+        <div class="row">
+            <label>До времени (исключая):<input class="block" type="time" name="timeTo" value="${timeTo}"/></label>
+        </div>
+        <br>
+        <button type="submit" name="filter">Отфильтровать</button>
+    </form>
     <br><br>
     <table border="1" cellpadding="8" cellspacing="0">
         <thead>

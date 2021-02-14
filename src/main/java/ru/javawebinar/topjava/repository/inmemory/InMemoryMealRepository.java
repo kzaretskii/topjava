@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Repository
@@ -56,6 +57,16 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public List<Meal> getAll(int userId) {
         return filteredByUserId(repository.values(), userId);
+    }
+
+    @Override
+    public List<Meal> getAllFilter(Predicate<Meal> filter, int userId) {
+        return filteredByPredicate(filter, getAll(userId));
+    }
+
+    private List<Meal> filteredByPredicate(Predicate<Meal> filter, Collection<Meal> meals) {
+        return meals.stream().filter(filter)
+                .collect(Collectors.toList());
     }
 
     private List<Meal> filteredByUserId(Collection<Meal> meals, int userId) {

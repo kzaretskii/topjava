@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 
 import javax.servlet.ServletException;
@@ -12,7 +13,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
@@ -35,6 +38,19 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
+        if (request.getParameter("filter") != null) {
+            MealRestController controller = appCtx.getBean(MealRestController.class);
+            request.setAttribute("dateFrom", request.getParameter("dateFrom"));
+            request.setAttribute("dateTo", request.getParameter("dateTo"));
+            request.setAttribute("timeFrom", request.getParameter("timeFrom"));
+            request.setAttribute("timeTo", request.getParameter("timeTo"));
+            request.setAttribute("meals",
+                    controller.getAllWithFilter(DateTimeUtil.parseDateOrDefault(request.getParameter("dateFrom"), LocalDate.MIN),
+                            DateTimeUtil.parseDateOrDefault(request.getParameter("dateTo"), LocalDate.MAX),
+                            DateTimeUtil.parseTimeOrDefault(request.getParameter("timeFrom"), LocalTime.MIN),
+                            DateTimeUtil.parseTimeOrDefault(request.getParameter("timeTo"), LocalTime.MAX)));
+            request.getRequestDispatcher("/meals.jsp").forward(request, response);
+        }
         String id = request.getParameter("id");
 
         Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),

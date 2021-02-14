@@ -42,8 +42,8 @@ public class MealService {
         checkResult(result);
     }
 
-    public List<MealTo> getAll(int userId) {
-        return MealsUtil.getTos(repository.getAll(userId), MealsUtil.DEFAULT_CALORIES_PER_DAY);
+    public List<MealTo> getAll(int userId, int caloriesPerDay) {
+        return MealsUtil.getTos(repository.getAll(userId), caloriesPerDay);
     }
 
     private void checkResult(Meal meal) {

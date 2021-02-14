@@ -11,6 +11,7 @@ import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
+import static ru.javawebinar.topjava.web.SecurityUtil.authUserCaloriesPerDay;
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 
 @Controller
@@ -25,7 +26,7 @@ public class MealRestController {
 
     public List<MealTo> getAll() {
         log.info("getAll");
-        return service.getAll(authUserId());
+        return service.getAll(authUserId(), authUserCaloriesPerDay());
     }
 
     public Meal get(int id) {

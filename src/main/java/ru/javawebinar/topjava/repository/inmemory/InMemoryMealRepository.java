@@ -18,15 +18,15 @@ public class InMemoryMealRepository implements MealRepository {
     private final AtomicInteger counter = new AtomicInteger(0);
 
     {
-        MealsUtil.meals.forEach(meal -> save(meal, meal.getDescription().contains("user1") ? 1 : 2));
+        MealsUtil.mealsForFirstUser.forEach(meal -> save(meal, 1));
+        MealsUtil.mealsForSecondUser.forEach(meal -> save(meal, 2));
     }
 
     @Override
     public Meal save(Meal meal, int userId) {
         Map<Integer, Meal> userMeals = repository.get(userId);
         if (userMeals == null) {
-            userMeals = new ConcurrentHashMap<>();
-            repository.put(userId, userMeals);
+            userMeals = repository.computeIfAbsent(userId, v -> new ConcurrentHashMap<>());
         }
         if (meal.isNew()) {
             meal.setUserId(userId);
@@ -55,11 +55,7 @@ public class InMemoryMealRepository implements MealRepository {
     @Override
     public Meal get(int id, int userId) {
         Map<Integer, Meal> userMeals = repository.get(userId);
-        if (userMeals == null) {
-            return null;
-        }
-        Meal meal = userMeals.get(id);
-        return meal;
+        return userMeals == null ? null : userMeals.get(id);
     }
 
     @Override
@@ -83,7 +79,8 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     private List<Meal> filteredByPredicateAndSorted(Predicate<Meal> filter, Collection<Meal> meals) {
-        return meals.stream().filter(filter)
+        return meals.stream()
+                .filter(filter)
                 .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
     }

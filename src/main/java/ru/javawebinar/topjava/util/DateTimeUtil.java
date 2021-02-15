@@ -17,11 +17,11 @@ public class DateTimeUtil {
     }
 
     public static LocalDate parseDate(String date) {
-        return date.isEmpty() ? null : LocalDate.parse(date);
+        return date == null || date.isEmpty() ? null : LocalDate.parse(date);
     }
 
     public static LocalTime parseTime(String time) {
-        return time.isEmpty() ? null : LocalTime.parse(time);
+        return time == null || time.isEmpty() ? null : LocalTime.parse(time);
     }
 }
 

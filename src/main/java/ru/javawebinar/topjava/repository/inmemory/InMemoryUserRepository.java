@@ -7,6 +7,7 @@ import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,9 +21,9 @@ public class InMemoryUserRepository implements UserRepository {
     private final AtomicInteger counter = new AtomicInteger(0);
 
     {
-        User user = new User(counter.incrementAndGet(), "testUser", "email@mail.ru", "pass", Role.USER, Role.ADMIN);
+        User user = new User(null, "testUser", "email@mail.ru", "pass", Role.USER, Role.ADMIN);
         user.setCaloriesPerDay(2000);
-        repository.put(user.getId(), user);
+        save(user);
     }
 
     @Override
@@ -52,17 +53,16 @@ public class InMemoryUserRepository implements UserRepository {
     public List<User> getAll() {
         log.info("getAll");
         return repository.values().stream()
-                .sorted((o1, o2) -> {
-                    if (o1.getName().equals(o2.getName()))
-                        return o1.getId().compareTo(o2.getId());
-                    else return o1.getName().compareTo(o2.getName());
-                })
+                .sorted(Comparator.comparing(User::getName).thenComparing(User::getEmail))
                 .collect(Collectors.toList());
     }
 
     @Override
     public User getByEmail(String email) {
         log.info("getByEmail {}", email);
-        return repository.values().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
+        return repository.values().stream()
+                .filter(u -> u.getEmail().equals(email))
+                .findFirst()
+                .orElse(null);
     }
 }

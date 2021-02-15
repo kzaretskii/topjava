@@ -5,7 +5,7 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
-import ru.javawebinar.topjava.util.exception.NotFoundException;
+import ru.javawebinar.topjava.util.ValidationUtil;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,7 +13,6 @@ import java.util.List;
 
 @Service
 public class MealService {
-
     private final MealRepository repository;
 
     public MealService(MealRepository repository) {
@@ -22,26 +21,23 @@ public class MealService {
 
     public Meal create(Meal meal, int userId) {
         Meal result = repository.save(meal, userId);
-        checkResult(result);
         return result;
     }
 
     public Meal get(int id, int userId) {
         Meal result = repository.get(id, userId);
-        checkResult(result);
+        ValidationUtil.checkNotFoundWithId(result, id);
         return result;
     }
 
     public void update(Meal meal, int userId) {
-        if (meal.isNew())
-            throw new NotFoundException("Not found meal");
         Meal result = repository.save(meal, userId);
-        checkResult(result);
+        ValidationUtil.checkNotFoundWithId(result, meal.getId());
     }
 
     public void delete(int id, int userId) {
         boolean result = repository.delete(id, userId);
-        checkResult(result);
+        ValidationUtil.checkNotFoundWithId(result, id);
     }
 
     public List<MealTo> getAll(int userId, int caloriesPerDay) {
@@ -49,22 +45,7 @@ public class MealService {
     }
 
     public List<MealTo> getAllWithFilter(LocalDate dateFrom, LocalDate dateTo, LocalTime timeFrom, LocalTime timeTo, int userId, int caloriesPerDay) {
-
-        return MealsUtil.getFilteredTos(repository.getAllFilter(meal ->
-                        meal.getDate().compareTo(dateFrom) >= 0
-                                && meal.getDate().compareTo(dateTo) <= 0
-                , userId),
+        return MealsUtil.getFilteredTos(repository.getAllFilter(dateFrom, dateTo, userId),
                 caloriesPerDay, timeFrom, timeTo);
     }
-
-    private void checkResult(Meal meal) {
-        if (meal == null)
-            throw new NotFoundException("Not found meal");
-    }
-
-    private void checkResult(boolean result) {
-        if (!result)
-            throw new NotFoundException("Not found meal");
-    }
-
 }

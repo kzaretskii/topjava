@@ -13,9 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
@@ -23,34 +21,22 @@ public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
 
     private ConfigurableApplicationContext appCtx;
+    private MealRestController controller;
 
     @Override
     public void init() {
         appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
+        controller = appCtx.getBean(MealRestController.class);
     }
 
     @Override
     public void destroy() {
-        super.destroy();
         appCtx.close();
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        if (request.getParameter("filter") != null) {
-            MealRestController controller = appCtx.getBean(MealRestController.class);
-            request.setAttribute("dateFrom", request.getParameter("dateFrom"));
-            request.setAttribute("dateTo", request.getParameter("dateTo"));
-            request.setAttribute("timeFrom", request.getParameter("timeFrom"));
-            request.setAttribute("timeTo", request.getParameter("timeTo"));
-            request.setAttribute("meals",
-                    controller.getAllWithFilter(DateTimeUtil.parseDateOrDefault(request.getParameter("dateFrom"), LocalDate.MIN),
-                            DateTimeUtil.parseDateOrDefault(request.getParameter("dateTo"), LocalDate.MAX),
-                            DateTimeUtil.parseTimeOrDefault(request.getParameter("timeFrom"), LocalTime.MIN),
-                            DateTimeUtil.parseTimeOrDefault(request.getParameter("timeTo"), LocalTime.MAX)));
-            request.getRequestDispatcher("/meals.jsp").forward(request, response);
-        }
         String id = request.getParameter("id");
 
         Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
@@ -59,17 +45,17 @@ public class MealServlet extends HttpServlet {
                 Integer.parseInt(request.getParameter("calories")));
 
         log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
-        MealRestController controller = appCtx.getBean(MealRestController.class);
-        if (meal.isNew())
+        if (meal.isNew()) {
             controller.create(meal);
-        else controller.update(meal, meal.getId());
+        } else {
+            controller.update(meal, meal.getId());
+        }
         response.sendRedirect("meals");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        MealRestController controller = appCtx.getBean(MealRestController.class);
 
         switch (action == null ? "all" : action) {
             case "delete":
@@ -85,6 +71,15 @@ public class MealServlet extends HttpServlet {
                         controller.get(getId(request));
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
+                break;
+            case "filter":
+                log.info("filter");
+                request.setAttribute("meals",
+                        controller.getAllWithFilter(DateTimeUtil.parseDate(request.getParameter("dateFrom")),
+                                DateTimeUtil.parseDate(request.getParameter("dateTo")),
+                                DateTimeUtil.parseTime(request.getParameter("timeFrom")),
+                                DateTimeUtil.parseTime(request.getParameter("timeTo"))));
+                request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
             case "all":
             default:

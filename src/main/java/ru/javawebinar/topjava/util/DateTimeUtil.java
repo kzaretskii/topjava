@@ -16,16 +16,12 @@ public class DateTimeUtil {
         return ldt == null ? "" : ldt.format(DATE_TIME_FORMATTER);
     }
 
-    public static LocalDate parseDateOrDefault(String date, LocalDate defaultDate) {
-        if (date.isEmpty())
-            return defaultDate;
-        return LocalDate.parse(date);
+    public static LocalDate parseDate(String date) {
+        return date.isEmpty() ? null : LocalDate.parse(date);
     }
 
-    public static LocalTime parseTimeOrDefault(String time, LocalTime defaultTime) {
-        if (time.isEmpty())
-            return defaultTime;
-        return LocalTime.parse(time);
+    public static LocalTime parseTime(String time) {
+        return time.isEmpty() ? null : LocalTime.parse(time);
     }
 }
 

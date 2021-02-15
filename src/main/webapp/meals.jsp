@@ -30,21 +30,22 @@
     <h3><a href="index.html">Home</a></h3>
     <hr/>
     <h2>Meals</h2>
-    <form method="post" action="meals">
+    <form method="get" action="meals">
+        <input type="hidden" name="action" value="filter"/>
         <div class="row">
-            <label>От даты (включая):<input class="block" type="date" name="dateFrom" value="${dateFrom}"/></label>
+            <label>От даты (включая):<input class="block" type="date" name="dateFrom" value="${param.dateFrom}"/></label>
         </div>
         <div class="row">
-            <label>До даты (включая):<input class="block" type="date" name="dateTo" value="${dateTo}"/></label>
+            <label>До даты (включая):<input class="block" type="date" name="dateTo" value="${param.dateTo}"/></label>
         </div>
         <div class="row">
-            <label>От времени (включая):<input class="block" type="time" name="timeFrom" value="${timeFrom}"/></label>
+            <label>От времени (включая):<input class="block" type="time" name="timeFrom" value="${param.timeFrom}"/></label>
         </div>
         <div class="row">
-            <label>До времени (исключая):<input class="block" type="time" name="timeTo" value="${timeTo}"/></label>
+            <label>До времени (исключая):<input class="block" type="time" name="timeTo" value="${param.timeTo}"/></label>
         </div>
         <br>
-        <button type="submit" name="filter">Отфильтровать</button>
+        <button type="submit">Отфильтровать</button>
     </form>
     <a href="meals?action=create">Add Meal</a>
     <table border="1" cellpadding="8" cellspacing="0">

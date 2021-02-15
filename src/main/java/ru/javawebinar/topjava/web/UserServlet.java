@@ -22,8 +22,9 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (request.getParameter("selectUser") != null) {
+            log.debug("choose user and redirect to meals");
             SecurityUtil.setUserId(Integer.parseInt(request.getParameter("selectUser")));
-            response.sendRedirect("index.html");
+            response.sendRedirect("meals");
         }
     }
 }

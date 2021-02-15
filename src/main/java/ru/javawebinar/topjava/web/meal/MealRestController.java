@@ -18,7 +18,7 @@ import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 
 @Controller
 public class MealRestController {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final MealService service;
 
@@ -33,7 +33,11 @@ public class MealRestController {
 
     public List<MealTo> getAllWithFilter(LocalDate dateFrom, LocalDate dateTo, LocalTime timeFrom, LocalTime timeTo) {
         log.info("getAllWithFilter");
-        return service.getAllWithFilter(dateFrom, dateTo, timeFrom, timeTo, authUserId(), authUserCaloriesPerDay());
+        return service.getAllWithFilter(dateFrom == null ? LocalDate.MIN : dateFrom,
+                dateTo == null ? LocalDate.MAX : dateTo,
+                timeFrom == null ? LocalTime.MIN : timeFrom,
+                timeTo == null ? LocalTime.MAX : timeTo,
+                authUserId(), authUserCaloriesPerDay());
     }
 
     public Meal get(int id) {
@@ -57,5 +61,4 @@ public class MealRestController {
         log.info("delete {}", id);
         service.delete(id, authUserId());
     }
-
 }

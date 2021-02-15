@@ -2,8 +2,8 @@ package ru.javawebinar.topjava.repository;
 
 import ru.javawebinar.topjava.model.Meal;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.function.Predicate;
 
 public interface MealRepository {
     // null if updated meal do not belong to userId
@@ -18,5 +18,5 @@ public interface MealRepository {
     // ORDERED dateTime desc
     List<Meal> getAll(int userId);
 
-    List<Meal> getAllFilter(Predicate<Meal> filter, int userId);
+    List<Meal> getAllFilter(LocalDate dateFrom, LocalDate dateTo, int userId);
 }
